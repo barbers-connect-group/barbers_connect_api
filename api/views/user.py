@@ -35,6 +35,16 @@ def login(request):
     serializer = UserSerializer(user)
     return Response({'token': token.key, 'user': serializer.data})
 
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([permissions.IsAuthenticated])
+def current_user(request):
+    user = request.user
+    return Response({
+        'username': user.username,
+        'email': user.email,
+        'created_at': user.date_joined
+    })
 
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
