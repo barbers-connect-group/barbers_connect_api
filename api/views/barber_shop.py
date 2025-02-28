@@ -6,12 +6,7 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework.response import Response
 
 from api.models import BarberShop
-
-
-class BarberShopSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BarberShop
-        fields = '__all__'
+from api.serializers import BarberShopSerializer
 
 
 class BarberShopPagination(PageNumberPagination):
