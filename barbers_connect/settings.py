@@ -1,5 +1,6 @@
-from pathlib import Path
 import os
+from pathlib import Path
+from google.oauth2 import service_account
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -37,7 +38,8 @@ INSTALLED_APPS = [
     'drf_spectacular',
 
     # PROJECT APPS
-    'api'
+    'api',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -124,6 +126,21 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / "staticfiles_build" / "static"
 
+# STATICFILES_DIRS = [OS
+
+# GPC CLOUD STORAGE
+# Configuração do Google Cloud Storage
+DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+GS_BUCKET_NAME = 'barbersconnect-bucket'
+GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
+    os.path.join(BASE_DIR, 'credentials.json')
+)
+GS_QUERYSTRING_AUTH = False
+MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/"
+
+STORAGES = {"default": {"BACKEND": "storages.backends.gcloud.GoogleCloudStorage"},
+            "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"}}
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -135,6 +152,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated'
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
 SPECTACULAR_SETTINGS = {

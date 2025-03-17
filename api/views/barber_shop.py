@@ -4,8 +4,10 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.pagination import PageNumberPagination
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework.response import Response
+from django.db.models import Subquery
 
 from api.models import BarberShop
+from api.models import Tag
 from api.serializers import BarberShopSerializer
 
 
@@ -26,11 +28,28 @@ class BarberShopPagination(PageNumberPagination):
     ]
 )
 class BarberShopViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = BarberShop.objects.all()
     serializer_class = BarberShopSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     pagination_class = BarberShopPagination
+
+    def get_queryset(self):
+        queryset = BarberShop.objects.all()
+        name = self.request.query_params.get('name')
+        if name is not None:
+            queryset = queryset.filter(name__icontains=name)
+
+        tag_name = self.request.query_params.get('tag_name')
+        if tag_name is not None:
+            queryset = queryset.filter(
+                tags__id__in=Subquery(
+                    Tag.objects.filter(name__icontains=tag_name)
+                    .values_list('id', flat=True)
+                )
+            )
+
+        return queryset
+
 
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
