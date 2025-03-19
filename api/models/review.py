@@ -30,3 +30,7 @@ class Review(models.Model):
         if self.image and 'temp_' in self.image.name:
             self.image.name = f"reviews/image_{self.id}"
         super().save(*args, **kwargs)
+
+        if self.image and self.image.url:
+            self.image_path = self.image.url
+            super().save()
