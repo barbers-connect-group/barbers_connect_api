@@ -25,12 +25,14 @@ class Review(models.Model):
         return f"{self.user.username} - {self.barbershop.name} ({self.rating}/5)"
 
     def save(self, *args, **kwargs):
-        if self.pk is None:
-            super().save(*args, **kwargs)
-        if self.image and 'temp_' in self.image.name:
-            self.image.name = f"reviews/image_{self.id}"
+        image = self.image
+        self.image = None
         super().save(*args, **kwargs)
+        self.image = image
 
         if self.image and self.image.url:
-            self.image_path = self.image.url
+            temp_url = self.image.url.split('/')
+            temp_url[-1] = f'image_{self.pk}.' + temp_url[-1].split('.')[1]
+            self.image_path = '/'.join(temp_url)
+
             super().save()
