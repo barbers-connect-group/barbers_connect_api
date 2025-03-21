@@ -32,7 +32,7 @@ class Review(models.Model):
 
         if self.image and self.image.url:
             temp_url = self.image.url.split('/')
-            temp_url[-1] = f'image_{self.pk}.' + temp_url[-1].split('.')[1]
+            temp_url[-1] = f'reviews/image_{self.pk}.' + temp_url[-1].split('.')[1]
             self.image_path = '/'.join(temp_url)
 
             super().save()
